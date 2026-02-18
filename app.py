@@ -90,7 +90,7 @@ def login_page():
         password = st.text_input("Password", type="password")
 
         if st.button("Login"):
-            if username=="admin" and password=="1234":
+            if username in st.session_state.users and st.session_state.users[username]==password:
                 st.session_state.login=True
                 st.success("Login successful")
                 time.sleep(1)
