@@ -54,6 +54,25 @@ animation:fadeIn 1s}
 @keyframes beat{0%{transform:scale(1)}25%{transform:scale(1.08)}40%{transform:scale(1)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
 .beat{animation:beat 1.2s infinite;color:#ff4b5c;font-size:28px;text-align:center}
 
+/* Holographic Theme */
+.stApp{
+background:linear-gradient(120deg,#0f2027,#1a2a6c,#b21f1f,#fdbb2d);
+background-size:300% 300%;
+animation:holo 12s ease infinite}
+@keyframes holo{0%{background-position:0%}50%{background-position:100%}100%{background-position:0%}}
+
+/* ECG Line */
+.ecg{height:120px;position:relative}
+.ecg:before{
+content:"";
+position:absolute;
+width:100%;height:2px;background:#00eaff;
+animation:ecg 2s linear infinite}
+@keyframes ecg{
+0%{clip-path:polygon(0 50%,10% 50%,15% 20%,20% 80%,25% 50%,40% 50%,45% 30%,50% 70%,55% 50%,100% 50%)}
+100%{clip-path:polygon(0 50%,10% 50%,15% 20%,20% 80%,25% 50%,40% 50%,45% 30%,50% 70%,55% 50%,100% 50%)}
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -144,24 +163,29 @@ def header_image():
 # ---------------- DASHBOARD ----------------
 def dashboard():
     header_image()
-
     user=st.session_state.current_user
 
     st.markdown(f"## Welcome, {user} 👋")
 
-    st.markdown("### 🌟 Health Motivation")
-    st.info("Consistent monitoring today prevents serious illness tomorrow.")
+    # Voice Greeting
+    st.markdown(f"""
+    <script>
+    var msg = new SpeechSynthesisUtterance("Welcome {user}. Your health assistant is ready.");
+    window.speechSynthesis.speak(msg);
+    </script>
+    """,unsafe_allow_html=True)
 
-    st.markdown("### 💬 Daily Wellness Tip")
-    tips=[
-        "Drink more water 💧",
-        "Walk daily 🚶",
-        "Avoid excess sugar 🍬",
-        "Sleep well 😴",
-        "Take medicines on time 💊"
-    ]
-    import random
-    st.success(random.choice(tips))
+    st.markdown("### 🌟 Health Motivation")
+    st.info("Small daily health decisions create big lifetime benefits.")
+
+    st.markdown("### ❤️ Live Heart Monitor")
+    import numpy as np, pandas as pd
+    pulse = np.sin(np.linspace(0,10,200))
+    df=pd.DataFrame(pulse,columns=["pulse"])
+    st.line_chart(df)
+
+    st.markdown("### 📈 ECG Monitor")
+    st.markdown("<div class='ecg'></div>",unsafe_allow_html=True)
 
     st.markdown("---")
     st.markdown("## 🧾 Personal & Medical Profile")
