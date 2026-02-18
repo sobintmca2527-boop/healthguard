@@ -19,7 +19,7 @@ html, body, [class*="css"]{font-family:'Poppins',sans-serif;}
 .card{background:rgba(255,255,255,0.08);padding:28px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.4);backdrop-filter:blur(10px);animation:fadeIn .8s}
 @keyframes fadeIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
 
-.title{font-size:44px;font-weight:600;text-align:center}
+.title{font-size:58px;font-weight:700;text-align:center;letter-spacing:1px;animation:fadeIn 1s ease}
 .subtitle{text-align:center;color:#d1d1d1;margin-bottom:15px}
 
 /* Sidebar */
@@ -37,6 +37,11 @@ div[data-baseweb="input"] input:focus{border:1px solid #00e0ff!important;box-sha
 .stButton>button:hover{transform:scale(1.03)}
 
 label{font-weight:500!important;color:#e8f6ff!important}
+img.header{display:block;margin:auto;width:180px;filter:drop-shadow(0 0 15px #00e0ff88);animation:float 3s ease-in-out infinite}
+@keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-12px)}100%{transform:translateY(0)}}
+
+.card:hover{transform:scale(1.02);transition:.4s}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -61,19 +66,21 @@ if "page" not in st.session_state:
 
 # ---------------- LOGIN PAGE ----------------
 def login_page():
-    st.markdown('<div class="title">HealthGuard Pro</div>',unsafe_allow_html=True)
-    st.markdown('<div class="subtitle">Secure AI Health Portal</div>',unsafe_allow_html=True)
+    st.markdown("<img class='header' src='https://cdn-icons-png.flaticon.com/512/2966/2966485.png'>",unsafe_allow_html=True)
+    st.markdown('<div class="title">HealthGuard</div>',unsafe_allow_html=True)
+    st.markdown('<div class="subtitle">AI Medical Intelligence System</div>',unsafe_allow_html=True)
     st.write("")
 
-    col1,col2,col3 = st.columns([1,1.2,1])
+    left,center,right = st.columns([1.2,1.5,1.2])
 
-    with col2:
+    with center:
         st.markdown('<div class="card">',unsafe_allow_html=True)
+        st.markdown("### 🔐 Secure Login")
 
-        st.markdown("#### 🔐 Login Account")
-        username = st.text_input("👤 Username")
-        password = st.text_input("🔑 Password", type="password")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
 
+        st.write("")
         if st.button("Login"):
             if username in st.session_state.users and st.session_state.users[username]==password:
                 st.session_state.login=True
@@ -104,17 +111,13 @@ def sidebar():
 
 
 # ---------------- TYPING HEADER ----------------
-def typing_header(text):
-    placeholder=st.empty()
-    out=""
-    for char in text:
-        out+=char
-        placeholder.markdown(f"<h1 style='text-align:center'>{out}</h1>",unsafe_allow_html=True)
-        time.sleep(0.03)
+def header_image():
+    st.markdown("<img class='header' src='https://cdn-icons-png.flaticon.com/512/3774/3774299.png'>",unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;font-size:52px'>HealthGuard AI Dashboard</h1>",unsafe_allow_html=True)
 
 # ---------------- DASHBOARD ----------------
 def dashboard():
-    typing_header("HealthGuard AI Dashboard")
+    header_image()
 
     col1,col2,col3 = st.columns(3)
 
