@@ -75,6 +75,9 @@ if "users" not in st.session_state:
 if "page" not in st.session_state:
     st.session_state.page="login"
 
+if "current_user" not in st.session_state:
+    st.session_state.current_user=""
+
 
 # ---------------- LOGIN PAGE ----------------
 def login_page():
@@ -106,6 +109,7 @@ def login_page():
         if login_click:
             if username in st.session_state.users and st.session_state.users[username]==password:
                 st.session_state.login=True
+                st.session_state.current_user=username
                 st.success("Login successful")
                 time.sleep(1)
                 st.rerun()
@@ -128,7 +132,7 @@ def sidebar():
         """,unsafe_allow_html=True)
 
     page = st.sidebar.radio("",
-        ["🏠 Dashboard","🧪 Diabetes Prediction","❤️ Heart Prediction","💡 Health Tips","🚪 Logout"])
+        ["🏠 Dashboard","🧪 Diabetes Prediction","❤️ Heart Prediction","👤 Account","🪪 Patient ID","📄 Report","🩺 Doctor Panel","💡 Health Tips","🚪 Logout"]) 
     return page
 
 
@@ -141,14 +145,23 @@ def header_image():
 def dashboard():
     header_image()
 
-    c1,c2,c3=st.columns(3)
-    c1.markdown("<div class='neo'><h3>🩺 Stay Healthy</h3><p>Prevention is better than cure. Monitor your health regularly.</p></div>",unsafe_allow_html=True)
-    c2.markdown("<div class='neo'><h3>💊 Reminders</h3><p>Take medicines on time and maintain diet discipline.</p></div>",unsafe_allow_html=True)
-    c3.markdown("<div class='neo'><h3>🏃 Motivation</h3><p>Daily activity + good sleep = strong heart & mind.</p></div>",unsafe_allow_html=True)
+    user=st.session_state.current_user
 
-    st.write("")
-    st.markdown("### ❤️ Health Status Indicator")
-    st.markdown("<div class='beat'>♥ Monitoring Active</div>",unsafe_allow_html=True)
+    st.markdown(f"## Welcome, {user} 👋")
+
+    st.markdown("### 🌟 Health Motivation")
+    st.info("Consistent monitoring today prevents serious illness tomorrow.")
+
+    st.markdown("### 💬 Daily Wellness Tip")
+    tips=[
+        "Drink more water 💧",
+        "Walk daily 🚶",
+        "Avoid excess sugar 🍬",
+        "Sleep well 😴",
+        "Take medicines on time 💊"
+    ]
+    import random
+    st.success(random.choice(tips))
 
     st.markdown("---")
     st.markdown("## 🧾 Personal & Medical Profile")
@@ -292,6 +305,74 @@ def tips():
         st.success(tip)
 
 
+# ---------------- ACCOUNT PAGE ----------------
+def account():
+    st.markdown("## 👤 Account Information")
+
+    user=st.session_state.current_user
+    st.success(f"Logged in as: {user}")
+
+    st.markdown("### Profile Photo")
+    img=st.file_uploader("Upload profile image",type=["png","jpg","jpeg"])
+    if img:
+        st.image(img,width=150)
+
+    st.markdown("### Account Details")
+    st.write("Username:",user)
+    st.write("Role: User")
+    st.write("Status: Active")
+
+
+# ---------------- PATIENT ID CARD ----------------
+def patient_id():
+    st.markdown("## 🪪 Patient ID Card")
+    name=st.text_input("Full Name")
+    age=st.number_input("Age",1,120,25)
+    blood=st.selectbox("Blood Group",["A+","A-","B+","B-","O+","O-","AB+","AB-"])
+
+    if st.button("Generate ID Card"):
+        st.markdown(f"""
+        <div style='padding:25px;border-radius:20px;background:#ffffff10;text-align:center'>
+        <h2>HealthGuard Patient Card</h2>
+        <h3>{name}</h3>
+        <p>Age: {age}</p>
+        <p>Blood Group: {blood}</p>
+        </div>
+        """,unsafe_allow_html=True)
+
+
+# ---------------- REPORT PAGE ----------------
+def report():
+    st.markdown("## 📄 Health Report")
+    glucose=st.slider("Glucose",70,200,110)
+    chol=st.slider("Cholesterol",100,300,180)
+
+    if st.button("Generate Report"):
+        status1="Normal" if glucose<140 else "High"
+        status2="Normal" if chol<200 else "High"
+
+        report=f"""
+        HEALTH REPORT
+        -----------------
+        Glucose: {glucose} ({status1})
+        Cholesterol: {chol} ({status2})
+        """
+        st.text(report)
+        st.download_button("Download Report",report,file_name="report.txt")
+
+
+# ---------------- DOCTOR PANEL ----------------
+def doctor():
+    st.markdown("## 🩺 Doctor Dashboard")
+    st.info("Patient Monitoring Panel")
+
+    data={
+        "Patient":["Arun","Meera","John"],
+        "Risk":["Low","Moderate","High"]
+    }
+    st.table(data)
+
+
 # ---------------- LOGOUT ----------------
 def logout():
     st.session_state.login=False
@@ -332,9 +413,7 @@ def signup_page():
 if not st.session_state.login:
     if st.session_state.page=="login":
         login_page()
-        if st.button("Create new account"):
-            st.session_state.page="signup"
-            st.rerun()
+        
     else:
         signup_page()
 else:
@@ -343,5 +422,6 @@ else:
     if page=="🏠 Dashboard": dashboard()
     elif page=="🧪 Diabetes Prediction": diabetes()
     elif page=="❤️ Heart Prediction": heart()
+    elif page=="👤 Account": account()
     elif page=="💡 Health Tips": tips()
     elif page=="🚪 Logout": logout()
