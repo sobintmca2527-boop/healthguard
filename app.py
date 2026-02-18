@@ -41,6 +41,20 @@ html, body, [class*="css"]  {
     color:#d1d1d1;
 }
 
+/* Clean Input Boxes */
+input, textarea {
+    background-color:#ffffff15 !important;
+    border:1px solid rgba(255,255,255,0.2) !important;
+    border-radius:10px !important;
+    padding:10px !important;
+    color:white !important;
+}
+
+input:focus {
+    border:1px solid #00c6ff !important;
+    box-shadow:0 0 8px #00c6ff55 !important;
+}
+
 .stButton>button {
     width:100%;
     border-radius:10px;
@@ -167,18 +181,32 @@ def diabetes():
 def heart():
     st.markdown("## Heart Disease Prediction")
 
-    age = st.slider("Age",20,100,40)
-    sex = st.selectbox("Gender",[0,1])
-    cp = st.slider("Chest Pain Type",0,3,1)
-    chol = st.slider("Cholesterol",100,400,200)
-    maxhr = st.slider("Max Heart Rate",60,220,150)
-    oldpeak = st.slider("ST Depression",0.0,6.0,1.0)
+    st.markdown("### Enter Patient Data")
+
+    col1,col2,col3 = st.columns(3)
+
+    with col1:
+        age = st.number_input("Age",20,100,40)
+        sex = st.selectbox("Gender",["Female","Male"])
+        cp = st.selectbox("Chest Pain Type",[0,1,2,3])
+
+    with col2:
+        chol = st.number_input("Cholesterol",100,400,200)
+        maxhr = st.number_input("Max Heart Rate",60,220,150)
+        oldpeak = st.number_input("ST Depression",0.0,6.0,1.0)
+
+    with col3:
+        fasting = st.selectbox("Fasting Sugar >120",[0,1])
+        angina = st.selectbox("Exercise Induced Angina",[0,1])
+        vessels = st.selectbox("Major Vessels",[0,1,2,3])
+
+    sex_val = 1 if sex=="Male" else 0
 
     if st.button("Analyze Heart Risk"):
         if heart_model is None:
             st.error("Model not loaded")
         else:
-            data=np.array([[age,sex,cp,120,chol,0,0,maxhr,0,oldpeak,0,0,1]])
+            data=np.array([[age,sex_val,cp,120,chol,fasting,0,maxhr,angina,oldpeak,vessels,0,1]])
             prob=heart_model.predict_proba(data)[0][1]*100
 
             st.progress(int(prob))
