@@ -87,28 +87,10 @@ animation:ecg 2s linear infinite}
 .typing{font-size:20px;border-right:3px solid #00eaff;width:0;overflow:hidden;white-space:nowrap;animation:typing 4s steps(40,end) forwards}
 @keyframes typing{to{width:100%}}
 
-</style>erprint Scanner */
-.fingerprint{
-width:120px;height:120px;border-radius:50%;margin:auto;
-border:3px solid #00eaff;
-box-shadow:0 0 25px #00eaff88;
-animation:scan 2s infinite}
-@keyframes scan{0%{box-shadow:0 0 5px #00eaff}50%{box-shadow:0 0 35px #00eaff}100%{box-shadow:0 0 5px #00eaff}}
+</style>
+""", unsafe_allow_html=True)
 
-/* Radar Loader */
-.radar{width:140px;height:140px;border-radius:50%;margin:auto;
-border:2px solid #00ffaa;position:relative}
-.radar:before{
-content:"";position:absolute;width:100%;height:100%;border-radius:50%;
-background:conic-gradient(#00ffaa55 0deg,#0000 60deg);
-animation:radar 2s linear infinite}
-@keyframes radar{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-
-/* Typing AI Text */
-.typing{font-size:20px;border-right:3px solid #00eaff;width:0;overflow:hidden;white-space:nowrap;
-animation:typing 4s steps(
-""", unsafe_allow_html=TrHealthGuard</div>
-    st.markdown("<div class='fingerprint'></div>",unsafe_allow_html=True)------ LOAD MODELS ----------------
+# ---------------- LOAD MODELS ----------------
 try:
     diabetes_model = pickle.load(open("model.pkl","rb"))
     heart_model = pickle.load(open("heart_model.pkl","rb"))
@@ -133,7 +115,8 @@ if "current_user" not in st.session_state:
 # ---------------- LOGIN PAGE ----------------
 def login_page():
     st.markdown("<img class='header' src='https://cdn-icons-png.flaticon.com/512/2966/2966485.png'>",unsafe_allow_html=True)
-    st.markdown('<div class="title">HealthGuard</div>',unsafe_allow_html=True)
+    st.markdown('<div class="title">HealthGuard</div>
+    st.markdown("<div class='fingerprint'></div>",unsafe_allow_html=True)',unsafe_allow_html=True)
     st.markdown('<div class="subtitle">AI Medical Intelligence System</div>',unsafe_allow_html=True)
     st.write("")
 
@@ -187,13 +170,8 @@ def sidebar():
     return page
 
 
-# ---------------- TYPING HEADER ---------### 🧠 AI Diagnosis
-    st.markdown("<div class='typing'>Analyzing patient vitals and predicting risks...</div>",unsafe_allow_html=True)
-
-    st.markdown("### 📡 System Scan")
-    st.markdown("<div class='radar'></div>",unsafe_allow_html=True)
-
-    ### ❤️ Live Hea):
+# ---------------- TYPING HEADER ----------------
+def header_image():
     st.markdown("<img class='header' src='https://cdn-icons-png.flaticon.com/512/3774/3774299.png'>",unsafe_allow_html=True)
     st.markdown("<h1 style='text-align:center;font-size:52px'>HealthGuard AI Dashboard</h1>",unsafe_allow_html=True)
 
@@ -215,7 +193,13 @@ def dashboard():
     st.markdown("### 🌟 Health Motivation")
     st.info("Small daily health decisions create big lifetime benefits.")
 
-    st.markdown("### ❤️ Live Heart Monitor")
+    st.markdown("### 🧠 AI Diagnosis
+    st.markdown("<div class='typing'>Analyzing patient vitals and predicting risks...</div>",unsafe_allow_html=True)
+
+    st.markdown("### 📡 System Scan")
+    st.markdown("<div class='radar'></div>",unsafe_allow_html=True)
+
+    ### ❤️ Live Heart Monitor")
     import numpy as np, pandas as pd
     pulse = np.sin(np.linspace(0,10,200))
     df=pd.DataFrame(pulse,columns=["pulse"])
