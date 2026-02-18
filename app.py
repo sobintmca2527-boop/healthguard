@@ -70,6 +70,12 @@ except:
 if "login" not in st.session_state:
     st.session_state.login=False
 
+if "users" not in st.session_state:
+    st.session_state.users={"admin":"1234"}
+
+if "page" not in st.session_state:
+    st.session_state.page="login"
+
 
 # ---------------- LOGIN PAGE ----------------
 def login_page():
@@ -208,9 +214,45 @@ def logout():
     st.rerun()
 
 
+# ---------------- SIGNUP PAGE ----------------
+def signup_page():
+    st.markdown('<div class="title">Create Account</div>',unsafe_allow_html=True)
+    st.write("")
+
+    with st.container():
+        st.markdown('<div class="card">',unsafe_allow_html=True)
+
+        new_user = st.text_input("New Username")
+        new_pass = st.text_input("New Password", type="password")
+
+        if st.button("Sign Up"):
+            if new_user in st.session_state.users:
+                st.error("Username already exists")
+            elif new_user=="" or new_pass=="":
+                st.warning("Enter valid details")
+            else:
+                st.session_state.users[new_user]=new_pass
+                st.success("Account created successfully")
+                time.sleep(1)
+                st.session_state.page="login"
+                st.rerun()
+
+        if st.button("Back to Login"):
+            st.session_state.page="login"
+            st.rerun()
+
+        st.markdown('</div>',unsafe_allow_html=True)
+
+
 # ---------------- MAIN CONTROL ----------------
 if not st.session_state.login:
-    login_page()
+    if st.session_state.page=="login":
+        login_page()
+        if st.button("Create new account"):
+            st.session_state.page="signup"
+            st.rerun()
+    else:
+        signup_page()
 else:
     page=sidebar()
 
@@ -219,4 +261,3 @@ else:
     elif page=="Heart Prediction": heart()
     elif page=="Health Tips": tips()
     elif page=="Logout": logout()
-
