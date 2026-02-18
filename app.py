@@ -79,7 +79,6 @@ elif page == "📊 Health Insights":
 # ================= DIABETES =================
 elif page == "🩸 Diabetes":
 
-
     st.subheader("Diabetes Risk Assessment")
 
     col1, col2 = st.columns(2)
@@ -99,16 +98,17 @@ elif page == "🩸 Diabetes":
     bmi = weight / (height ** 2)
     st.write(f"### Calculated BMI: {bmi:.2f}")
 
-if bmi < 18.5:
-    st.info("BMI Category: Underweight")
-elif bmi < 25:
-    st.success("BMI Category: Normal")
-elif bmi < 30:
-    st.warning("BMI Category: Overweight")
-else:
-    st.error("BMI Category: Obese")
+    # ✅ MOVE BMI CATEGORY HERE
+    if bmi < 18.5:
+        st.info("BMI Category: Underweight")
+    elif bmi < 25:
+        st.success("BMI Category: Normal")
+    elif bmi < 30:
+        st.warning("BMI Category: Overweight")
+    else:
+        st.error("BMI Category: Obese")
 
-
+    # ✅ BUTTON MUST ALSO BE INSIDE
     if st.button("Analyze Diabetes Risk"):
 
         input_data = np.array([[preg, glucose, bp, 20, insulin, bmi, dpf, age]])
@@ -128,6 +128,7 @@ else:
         ax.bar(["Safe", "Risk"], [100 - probability, probability])
         ax.set_ylabel("Percentage")
         st.pyplot(fig)
+
 
 # ================= HEART =================
 elif page == "❤️ Heart Disease":
@@ -162,4 +163,5 @@ elif page == "❤️ Heart Disease":
                labels=["Risk", "Safe"],
                autopct="%1.1f%%")
         st.pyplot(fig)
+
 
