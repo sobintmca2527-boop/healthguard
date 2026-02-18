@@ -12,63 +12,31 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-html, body, [class*="css"]  {
-    font-family: 'Poppins', sans-serif;
-}
+html, body, [class*="css"]{font-family:'Poppins',sans-serif;}
 
-.stApp {
-    background: linear-gradient(to right,#0f2027,#203a43,#2c5364);
-    color:white;
-}
+.stApp{background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:white}
 
-.card {
-    background:#ffffff10;
-    padding:25px;
-    border-radius:18px;
-    box-shadow:0 8px 25px rgba(0,0,0,0.3);
-    backdrop-filter: blur(6px);
-}
+.card{background:rgba(255,255,255,0.08);padding:28px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.4);backdrop-filter:blur(10px);animation:fadeIn .8s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
 
-.title {
-    font-size:42px;
-    font-weight:600;
-    text-align:center;
-}
+.title{font-size:44px;font-weight:600;text-align:center}
+.subtitle{text-align:center;color:#d1d1d1;margin-bottom:15px}
 
-.subtitle {
-    text-align:center;
-    font-size:18px;
-    color:#d1d1d1;
-}
+/* Sidebar */
+section[data-testid="stSidebar"]{background:#0a1a24}
+section[data-testid="stSidebar"] .stRadio label{padding:8px;border-radius:10px;transition:.3s}
+section[data-testid="stSidebar"] .stRadio label:hover{background:#00c6ff22;transform:translateX(5px)}
 
-/* Clean Input Boxes */
-input, textarea {
-    background-color:#ffffff15 !important;
-    border:1px solid rgba(255,255,255,0.2) !important;
-    border-radius:10px !important;
-    padding:10px !important;
-    color:white !important;
-}
+/* Inputs */
+div[data-baseweb="input"] input{background:transparent!important;border:1px solid rgba(255,255,255,.3)!important;border-radius:12px!important;padding:12px!important;color:white!important}
+div[data-baseweb="input"] input:focus{border:1px solid #00e0ff!important;box-shadow:0 0 10px #00e0ff55}
 
-input:focus {
-    border:1px solid #00c6ff !important;
-    box-shadow:0 0 8px #00c6ff55 !important;
-}
+/* Buttons */
+.stButton>button{width:100%;border:none;border-radius:12px;height:48px;font-weight:600;font-size:16px;color:white;background:linear-gradient(45deg,#00e0ff,#0072ff,#00c6ff);background-size:200% 200%;animation:gradientMove 4s ease infinite}
+@keyframes gradientMove{0%{background-position:0%}50%{background-position:100%}100%{background-position:0%}}
+.stButton>button:hover{transform:scale(1.03)}
 
-.stButton>button {
-    width:100%;
-    border-radius:10px;
-    height:45px;
-    font-size:16px;
-    font-weight:600;
-    background:linear-gradient(to right,#00c6ff,#0072ff);
-    color:white;
-    border:none;
-}
-
-.stButton>button:hover {
-    transform: scale(1.02);
-}
+label{font-weight:500!important;color:#e8f6ff!important}
 </style>
 """, unsafe_allow_html=True)
 
@@ -94,14 +62,17 @@ if "page" not in st.session_state:
 # ---------------- LOGIN PAGE ----------------
 def login_page():
     st.markdown('<div class="title">HealthGuard Pro</div>',unsafe_allow_html=True)
-    st.markdown('<div class="subtitle">AI Health Risk Prediction System</div>',unsafe_allow_html=True)
+    st.markdown('<div class="subtitle">Secure AI Health Portal</div>',unsafe_allow_html=True)
     st.write("")
 
-    with st.container():
+    col1,col2,col3 = st.columns([1,1.2,1])
+
+    with col2:
         st.markdown('<div class="card">',unsafe_allow_html=True)
 
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
+        st.markdown("#### 🔐 Login Account")
+        username = st.text_input("👤 Username")
+        password = st.text_input("🔑 Password", type="password")
 
         if st.button("Login"):
             if username in st.session_state.users and st.session_state.users[username]==password:
@@ -117,15 +88,33 @@ def login_page():
 
 # ---------------- SIDEBAR MENU ----------------
 def sidebar():
-    st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to",
-        ["Dashboard","Diabetes Prediction","Heart Prediction","Health Tips","Logout"])
+    st.sidebar.markdown("## 🧭 Navigation")
+
+    theme = st.sidebar.toggle("🌙 Dark Mode",value=True)
+    if not theme:
+        st.markdown("""
+        <style>
+        .stApp{background:#f5f7fb;color:black}
+        </style>
+        """,unsafe_allow_html=True)
+
+    page = st.sidebar.radio("",
+        ["🏠 Dashboard","🧪 Diabetes Prediction","❤️ Heart Prediction","💡 Health Tips","🚪 Logout"])
     return page
 
 
+# ---------------- TYPING HEADER ----------------
+def typing_header(text):
+    placeholder=st.empty()
+    out=""
+    for char in text:
+        out+=char
+        placeholder.markdown(f"<h1 style='text-align:center'>{out}</h1>",unsafe_allow_html=True)
+        time.sleep(0.03)
+
 # ---------------- DASHBOARD ----------------
 def dashboard():
-    st.markdown("## Dashboard Overview")
+    typing_header("HealthGuard AI Dashboard")
 
     col1,col2,col3 = st.columns(3)
 
@@ -167,7 +156,11 @@ def diabetes():
             prob = diabetes_model.predict_proba(data)[0][1]*100
 
             st.progress(int(prob))
-            st.subheader(f"Risk: {prob:.2f}%")
+            meter=st.progress(0)
+            for i in range(int(prob)):
+                meter.progress(i+1)
+                time.sleep(0.01)
+            st.markdown(f"### Risk Probability: {prob:.2f}%")
 
             if prob<30:
                 st.success("Low Risk")
@@ -210,7 +203,11 @@ def heart():
             prob=heart_model.predict_proba(data)[0][1]*100
 
             st.progress(int(prob))
-            st.subheader(f"Risk: {prob:.2f}%")
+            meter=st.progress(0)
+            for i in range(int(prob)):
+                meter.progress(i+1)
+                time.sleep(0.01)
+            st.markdown(f"### Risk Probability: {prob:.2f}%")
 
             if prob<30:
                 st.success("Low Risk")
@@ -284,8 +281,8 @@ if not st.session_state.login:
 else:
     page=sidebar()
 
-    if page=="Dashboard": dashboard()
-    elif page=="Diabetes Prediction": diabetes()
-    elif page=="Heart Prediction": heart()
-    elif page=="Health Tips": tips()
-    elif page=="Logout": logout()
+    if page=="🏠 Dashboard": dashboard()
+    elif page=="🧪 Diabetes Prediction": diabetes()
+    elif page=="❤️ Heart Prediction": heart()
+    elif page=="💡 Health Tips": tips()
+    elif page=="🚪 Logout": logout()
