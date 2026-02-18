@@ -12,8 +12,15 @@ heart_model = pickle.load(open("heart_model.pkl", "rb"))
 
 # Sidebar
 st.sidebar.title("🩺 HealthGuard Pro")
+
+page = st.sidebar.selectbox(
+    "Navigate",
+    ["🏠 Home", "📊 Health Insights", "🩸 Diabetes", "❤️ Heart Disease"]
+)
+
 theme = st.sidebar.selectbox("Theme", ["Light", "Dark"])
-disease = st.sidebar.radio("Choose Assessment", ["Diabetes", "Heart Disease"])
+
+
 
 if theme == "Dark":
     st.markdown("""
@@ -28,8 +35,50 @@ if theme == "Dark":
 st.title("🩺 AI Health Risk Prediction Dashboard")
 st.markdown("Real-time multi-disease prediction system powered by Machine Learning")
 
+
+# ================= HOME =================
+if page == "🏠 Home":
+
+    st.title("🩺 Welcome to HealthGuard Pro")
+    st.markdown("### Your AI-Powered Health Monitoring Dashboard")
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("🌍 Global Diabetes Cases", "537M+")
+    col2.metric("❤️ Heart Disease Deaths", "20M+ / year")
+    col3.metric("🧠 Early Detection Accuracy", "85%+")
+
+    st.markdown("---")
+    st.info("Use the sidebar to navigate through health assessments and insights.")
+
+
+# ================= HEALTH INSIGHTS =================
+elif page == "📊 Health Insights":
+
+    st.subheader("📊 Global Health Trends")
+
+    data = {
+        "Year": [2018, 2019, 2020, 2021, 2022],
+        "Diabetes Cases (Millions)": [420, 450, 470, 500, 537],
+        "Heart Disease Cases (Millions)": [17, 18, 19, 19.5, 20]
+    }
+
+    df = pd.DataFrame(data)
+
+    st.line_chart(df.set_index("Year"))
+
+    st.markdown("### BMI Categories Guide")
+
+    bmi_table = pd.DataFrame({
+        "Category": ["Underweight", "Normal", "Overweight", "Obese"],
+        "BMI Range": ["<18.5", "18.5 - 24.9", "25 - 29.9", "30+"]
+    })
+
+    st.table(bmi_table)
+
 # ================= DIABETES =================
-if disease == "Diabetes":
+elif page == "🩸 Diabetes":
+
 
     st.subheader("Diabetes Risk Assessment")
 
@@ -49,6 +98,16 @@ if disease == "Diabetes":
 
     bmi = weight / (height ** 2)
     st.write(f"### Calculated BMI: {bmi:.2f}")
+
+if bmi < 18.5:
+    st.info("BMI Category: Underweight")
+elif bmi < 25:
+    st.success("BMI Category: Normal")
+elif bmi < 30:
+    st.warning("BMI Category: Overweight")
+else:
+    st.error("BMI Category: Obese")
+
 
     if st.button("Analyze Diabetes Risk"):
 
@@ -71,7 +130,8 @@ if disease == "Diabetes":
         st.pyplot(fig)
 
 # ================= HEART =================
-elif disease == "Heart Disease":
+elif page == "❤️ Heart Disease":
+
 
     st.subheader("Heart Disease Risk Assessment")
 
@@ -102,3 +162,4 @@ elif disease == "Heart Disease":
                labels=["Risk", "Safe"],
                autopct="%1.1f%%")
         st.pyplot(fig)
+
