@@ -25,7 +25,7 @@ st.sidebar.title("🩺 HealthGuard Pro")
 
 page = st.sidebar.selectbox(
     "Navigate",
-    ["🏠 Home", "📊 Health Insights", "🩸 Diabetes", "❤️ Heart Disease"]
+    ["Home", "Health Insights", "Diabetes", "Heart Disease"]
 )
 
 theme = st.sidebar.selectbox("Theme", ["Light", "Dark"])
@@ -42,30 +42,30 @@ if theme == "Dark":
         </style>
     """, unsafe_allow_html=True)
 
-st.title("🩺 AI Health Risk Prediction Dashboard")
+st.title("AI Health Risk Prediction Dashboard")
 st.markdown("Real-time multi-disease prediction system powered by Machine Learning")
 
 
 # ================= HOME =================
-if page == "🏠 Home":
+if page == "Home":
 
-    st.title("🩺 Welcome to HealthGuard Pro")
+    st.title("Welcome to HealthGuard Pro")
     st.markdown("### Your AI-Powered Health Monitoring Dashboard")
 
     col1, col2, col3 = st.columns(3)
 
-    col1.metric("🌍 Global Diabetes Cases", "537M+")
-    col2.metric("❤️ Heart Disease Deaths", "20M+ / year")
-    col3.metric("🧠 Early Detection Accuracy", "85%+")
+    col1.metric("Global Diabetes Cases", "537M+")
+    col2.metric("Heart Disease Deaths", "20M+ / year")
+    col3.metric("Early Detection Accuracy", "85%+")
 
     st.markdown("---")
     st.info("Use the sidebar to navigate through health assessments and insights.")
 
 
 # ================= HEALTH INSIGHTS =================
-elif page == "📊 Health Insights":
+elif page == "Health Insights":
 
-    st.subheader("📊 Global Health Trends")
+    st.subheader("Global Health Trends")
 
     data = {
         "Year": [2018, 2019, 2020, 2021, 2022],
@@ -87,7 +87,7 @@ elif page == "📊 Health Insights":
     st.table(bmi_table)
 
 # ================= DIABETES =================
-elif page == "🩸 Diabetes":
+elif page == "Diabetes":
 
     st.subheader("Diabetes Risk Assessment")
 
@@ -108,7 +108,6 @@ elif page == "🩸 Diabetes":
     bmi = weight / (height ** 2)
     st.write(f"### Calculated BMI: {bmi:.2f}")
 
-    # ✅ MOVE BMI CATEGORY HERE
     if bmi < 18.5:
         st.info("BMI Category: Underweight")
     elif bmi < 25:
@@ -118,46 +117,47 @@ elif page == "🩸 Diabetes":
     else:
         st.error("BMI Category: Obese")
 
-    # ✅ BUTTON MUST ALSO BE INSIDE
+    # BUTTON CORRECTLY INDENTED
     if st.button("Analyze Diabetes Risk"):
 
         input_data = np.array([[preg, glucose, bp, 20, insulin, bmi, dpf, age]])
         probability = diabetes_model.predict_proba(input_data)[0][1] * 100
         health_score = 100 - probability
-st.metric("🧬 Health Score", f"{health_score:.1f}/100")
 
+        st.metric("Health Score", f"{health_score:.1f}/100")
 
         st.progress(int(probability))
         st.write(f"### Risk Probability: {probability:.2f}%")
 
         if probability < 30:
-            st.success("🟢 Low Risk")
+            st.success("Low Risk")
         elif probability < 70:
-            st.warning("🟡 Moderate Risk")
+            st.warning("Moderate Risk")
         else:
-            st.error("🔴 High Risk - Consult Doctor")
+            st.error("High Risk - Consult Doctor")
 
         fig_gauge = go.Figure(go.Indicator(
-    mode="gauge+number",
-    value=probability,
-    title={'text': "Diabetes Risk Level"},
-    gauge={
-        'axis': {'range': [0, 100]},
-        'steps': [
-            {'range': [0, 30], 'color': "green"},
-            {'range': [30, 70], 'color': "yellow"},
-            {'range': [70, 100], 'color': "red"}
-        ],
-    }
-))
+            mode="gauge+number",
+            value=probability,
+            title={'text': "Diabetes Risk Level"},
+            gauge={
+                'axis': {'range': [0, 100]},
+                'steps': [
+                    {'range': [0, 30], 'color': "green"},
+                    {'range': [30, 70], 'color': "yellow"},
+                    {'range': [70, 100], 'color': "red"}
+                ],
+            }
+        ))
 
-st.plotly_chart(fig_gauge, use_container_width=True)
+        st.plotly_chart(fig_gauge, use_container_width=True)
+
+
 
 
 
 # ================= HEART =================
-elif page == "❤️ Heart Disease":
-
+elif page == "Heart Disease":
 
     st.subheader("Heart Disease Risk Assessment")
 
@@ -166,7 +166,7 @@ elif page == "❤️ Heart Disease":
     max_hr = st.slider("Maximum Heart Rate", 60, 220, 150)
     oldpeak = st.slider("ST Depression (Oldpeak)", 0.0, 6.0, 1.0)
 
-    # Default values for remaining features (based on common heart dataset)
+    # Default values for remaining features
     input_data = np.array([[age, 1, 0, 120, cholesterol, 0, 0, max_hr, 0, oldpeak, 0, 0, 1]])
 
     if st.button("Analyze Heart Risk"):
@@ -177,17 +177,22 @@ elif page == "❤️ Heart Disease":
         st.write(f"### Heart Disease Risk: {probability:.2f}%")
 
         if probability < 30:
-            st.success("🟢 Low Risk")
+            st.success("Low Risk")
         elif probability < 70:
-            st.warning("🟡 Moderate Risk")
+            st.warning("Moderate Risk")
         else:
-            st.error("🔴 High Risk - Seek Medical Advice")
+            st.error("High Risk - Seek Medical Advice")
 
-        fig, ax = plt.subplots()
-        ax.pie([probability, 100 - probability],
-               labels=["Risk", "Safe"],
-               autopct="%1.1f%%")
-        st.pyplot(fig)
+        col1, col2, col3 = st.columns([1,2,1])
+
+        with col2:
+            fig, ax = plt.subplots(figsize=(4,4))
+            ax.pie(
+                [probability, 100 - probability],
+                labels=["Risk", "Safe"],
+                autopct="%1.1f%%"
+            )
+            st.pyplot(fig)
 
 
 
