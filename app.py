@@ -2,197 +2,221 @@ import streamlit as st
 import pickle
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
+import time
 
+# ---------------- PAGE CONFIG ----------------
+st.set_page_config(page_title="HealthGuard Pro", layout="wide")
 
-st.set_page_config(page_title="HealthGuard Pro", page_icon="🩺", layout="wide")
+# ---------------- CUSTOM STYLING ----------------
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+html, body, [class*="css"]  {
+    font-family: 'Poppins', sans-serif;
+}
+
 .stApp {
-    background: linear-gradient(to right, #141E30, #243B55);
-    color: white;
+    background: linear-gradient(to right,#0f2027,#203a43,#2c5364);
+    color:white;
+}
+
+.card {
+    background:#ffffff10;
+    padding:25px;
+    border-radius:18px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.3);
+    backdrop-filter: blur(6px);
+}
+
+.title {
+    font-size:42px;
+    font-weight:600;
+    text-align:center;
+}
+
+.subtitle {
+    text-align:center;
+    font-size:18px;
+    color:#d1d1d1;
+}
+
+.stButton>button {
+    width:100%;
+    border-radius:10px;
+    height:45px;
+    font-size:16px;
+    font-weight:600;
+    background:linear-gradient(to right,#00c6ff,#0072ff);
+    color:white;
+    border:none;
+}
+
+.stButton>button:hover {
+    transform: scale(1.02);
 }
 </style>
 """, unsafe_allow_html=True)
 
-# Load models
-diabetes_model = pickle.load(open("model.pkl", "rb"))
-heart_model = pickle.load(open("heart_model.pkl", "rb"))
+# ---------------- LOAD MODELS ----------------
+try:
+    diabetes_model = pickle.load(open("model.pkl","rb"))
+    heart_model = pickle.load(open("heart_model.pkl","rb"))
+except:
+    diabetes_model=None
+    heart_model=None
 
-# Sidebar
-st.sidebar.title("🩺 HealthGuard Pro")
-
-page = st.sidebar.selectbox(
-    "Navigate",
-    ["Home", "Health Insights", "Diabetes", "Heart Disease"]
-)
-
-theme = st.sidebar.selectbox("Theme", ["Light", "Dark"])
+# ---------------- SESSION STATE ----------------
+if "login" not in st.session_state:
+    st.session_state.login=False
 
 
+# ---------------- LOGIN PAGE ----------------
+def login_page():
+    st.markdown('<div class="title">HealthGuard Pro</div>',unsafe_allow_html=True)
+    st.markdown('<div class="subtitle">AI Health Risk Prediction System</div>',unsafe_allow_html=True)
+    st.write("")
 
-if theme == "Dark":
-    st.markdown("""
-        <style>
-        .stApp {
-            background-color: #0e1117;
-            color: white;
-        }
-        </style>
-    """, unsafe_allow_html=True)
+    with st.container():
+        st.markdown('<div class="card">',unsafe_allow_html=True)
 
-st.title("AI Health Risk Prediction Dashboard")
-st.markdown("Real-time multi-disease prediction system powered by Machine Learning")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
 
+        if st.button("Login"):
+            if username=="admin" and password=="1234":
+                st.session_state.login=True
+                st.success("Login successful")
+                time.sleep(1)
+                st.rerun()
+            else:
+                st.error("Invalid credentials")
 
-# ================= HOME =================
-if page == "Home":
-
-    st.title("Welcome to HealthGuard Pro")
-    st.markdown("### Your AI-Powered Health Monitoring Dashboard")
-
-    col1, col2, col3 = st.columns(3)
-
-    col1.metric("Global Diabetes Cases", "537M+")
-    col2.metric("Heart Disease Deaths", "20M+ / year")
-    col3.metric("Early Detection Accuracy", "85%+")
-
-    st.markdown("---")
-    st.info("Use the sidebar to navigate through health assessments and insights.")
+        st.markdown('</div>',unsafe_allow_html=True)
 
 
-# ================= HEALTH INSIGHTS =================
-elif page == "Health Insights":
+# ---------------- SIDEBAR MENU ----------------
+def sidebar():
+    st.sidebar.title("Navigation")
+    page = st.sidebar.radio("Go to",
+        ["Dashboard","Diabetes Prediction","Heart Prediction","Health Tips","Logout"])
+    return page
 
-    st.subheader("Global Health Trends")
 
-    data = {
-        "Year": [2018, 2019, 2020, 2021, 2022],
-        "Diabetes Cases (Millions)": [420, 450, 470, 500, 537],
-        "Heart Disease Cases (Millions)": [17, 18, 19, 19.5, 20]
-    }
+# ---------------- DASHBOARD ----------------
+def dashboard():
+    st.markdown("## Dashboard Overview")
 
-    df = pd.DataFrame(data)
+    col1,col2,col3 = st.columns(3)
 
-    st.line_chart(df.set_index("Year"))
+    col1.metric("Global Diabetes","537 Million")
+    col2.metric("Heart Deaths","20 Million/yr")
+    col3.metric("Model Accuracy","~88%")
 
-    st.markdown("### BMI Categories Guide")
+    st.write("")
+    st.info("Select a module from sidebar to begin analysis.")
 
-    bmi_table = pd.DataFrame({
-        "Category": ["Underweight", "Normal", "Overweight", "Obese"],
-        "BMI Range": ["<18.5", "18.5 - 24.9", "25 - 29.9", "30+"]
-    })
 
-    st.table(bmi_table)
+# ---------------- DIABETES MODULE ----------------
+def diabetes():
+    st.markdown("## Diabetes Risk Prediction")
 
-# ================= DIABETES =================
-elif page == "Diabetes":
-
-    st.subheader("Diabetes Risk Assessment")
-
-    col1, col2 = st.columns(2)
+    col1,col2 = st.columns(2)
 
     with col1:
-        preg = st.number_input("Pregnancies", min_value=0)
-        glucose = st.slider("Glucose Level", 0, 200, 100)
-        bp = st.slider("Blood Pressure", 0, 150, 70)
-        insulin = st.slider("Insulin", 0, 900, 80)
+        preg = st.number_input("Pregnancies",0)
+        glucose = st.slider("Glucose",0,200,100)
+        bp = st.slider("Blood Pressure",0,150,70)
+        skin = st.slider("Skin Thickness",0,100,20)
 
     with col2:
-        height = st.number_input("Height (meters)", min_value=1.0, max_value=2.5)
-        weight = st.number_input("Weight (kg)", min_value=20.0, max_value=200.0)
-        age = st.slider("Age", 1, 100, 25)
-        dpf = st.number_input("Diabetes Pedigree Function", min_value=0.0)
+        insulin = st.slider("Insulin",0,900,80)
+        height = st.number_input("Height (m)",1.0,2.5)
+        weight = st.number_input("Weight (kg)",20.0,200.0)
+        age = st.slider("Age",1,100,25)
+        dpf = st.number_input("DPF",0.0)
 
-    bmi = weight / (height ** 2)
-    st.write(f"### Calculated BMI: {bmi:.2f}")
+    bmi = weight/(height**2)
+    st.success(f"BMI: {bmi:.2f}")
 
-    if bmi < 18.5:
-        st.info("BMI Category: Underweight")
-    elif bmi < 25:
-        st.success("BMI Category: Normal")
-    elif bmi < 30:
-        st.warning("BMI Category: Overweight")
-    else:
-        st.error("BMI Category: Obese")
-
-    # BUTTON CORRECTLY INDENTED
     if st.button("Analyze Diabetes Risk"):
-
-        input_data = np.array([[preg, glucose, bp, 20, insulin, bmi, dpf, age]])
-        probability = diabetes_model.predict_proba(input_data)[0][1] * 100
-        health_score = 100 - probability
-
-        st.metric("Health Score", f"{health_score:.1f}/100")
-
-        st.progress(int(probability))
-        st.write(f"### Risk Probability: {probability:.2f}%")
-
-        if probability < 30:
-            st.success("Low Risk")
-        elif probability < 70:
-            st.warning("Moderate Risk")
+        if diabetes_model is None:
+            st.error("Model not loaded")
         else:
-            st.error("High Risk - Consult Doctor")
+            data = np.array([[preg,glucose,bp,skin,insulin,bmi,dpf,age]])
+            prob = diabetes_model.predict_proba(data)[0][1]*100
 
-        fig_gauge = go.Figure(go.Indicator(
-            mode="gauge+number",
-            value=probability,
-            title={'text': "Diabetes Risk Level"},
-            gauge={
-                'axis': {'range': [0, 100]},
-                'steps': [
-                    {'range': [0, 30], 'color': "green"},
-                    {'range': [30, 70], 'color': "yellow"},
-                    {'range': [70, 100], 'color': "red"}
-                ],
-            }
-        ))
+            st.progress(int(prob))
+            st.subheader(f"Risk: {prob:.2f}%")
 
-        st.plotly_chart(fig_gauge, use_container_width=True)
+            if prob<30:
+                st.success("Low Risk")
+            elif prob<70:
+                st.warning("Moderate Risk")
+            else:
+                st.error("High Risk")
 
 
+# ---------------- HEART MODULE ----------------
+def heart():
+    st.markdown("## Heart Disease Prediction")
 
-
-
-# ================= HEART =================
-elif page == "Heart Disease":
-
-    st.subheader("Heart Disease Risk Assessment")
-
-    age = st.slider("Age", 20, 100, 40)
-    cholesterol = st.slider("Cholesterol", 100, 400, 200)
-    max_hr = st.slider("Maximum Heart Rate", 60, 220, 150)
-    oldpeak = st.slider("ST Depression (Oldpeak)", 0.0, 6.0, 1.0)
-
-    # Default values for remaining features
-    input_data = np.array([[age, 1, 0, 120, cholesterol, 0, 0, max_hr, 0, oldpeak, 0, 0, 1]])
+    age = st.slider("Age",20,100,40)
+    sex = st.selectbox("Gender",[0,1])
+    cp = st.slider("Chest Pain Type",0,3,1)
+    chol = st.slider("Cholesterol",100,400,200)
+    maxhr = st.slider("Max Heart Rate",60,220,150)
+    oldpeak = st.slider("ST Depression",0.0,6.0,1.0)
 
     if st.button("Analyze Heart Risk"):
-
-        probability = heart_model.predict_proba(input_data)[0][1] * 100
-
-        st.progress(int(probability))
-        st.write(f"### Heart Disease Risk: {probability:.2f}%")
-
-        if probability < 30:
-            st.success("Low Risk")
-        elif probability < 70:
-            st.warning("Moderate Risk")
+        if heart_model is None:
+            st.error("Model not loaded")
         else:
-            st.error("High Risk - Seek Medical Advice")
+            data=np.array([[age,sex,cp,120,chol,0,0,maxhr,0,oldpeak,0,0,1]])
+            prob=heart_model.predict_proba(data)[0][1]*100
 
-        col1, col2, col3 = st.columns([1,2,1])
+            st.progress(int(prob))
+            st.subheader(f"Risk: {prob:.2f}%")
 
-        with col2:
-            fig, ax = plt.subplots(figsize=(4,4))
-            ax.pie(
-                [probability, 100 - probability],
-                labels=["Risk", "Safe"],
-                autopct="%1.1f%%"
-            )
-            st.pyplot(fig)
+            if prob<30:
+                st.success("Low Risk")
+            elif prob<70:
+                st.warning("Moderate Risk")
+            else:
+                st.error("High Risk")
 
 
+# ---------------- HEALTH TIPS MODULE ----------------
+def tips():
+    st.markdown("## Smart Health Tips")
+
+    tips_list=[
+        "Exercise at least 30 minutes daily",
+        "Avoid excess sugar intake",
+        "Sleep minimum 7 hours",
+        "Drink enough water",
+        "Regular medical checkups"
+    ]
+
+    for tip in tips_list:
+        st.success(tip)
+
+
+# ---------------- LOGOUT ----------------
+def logout():
+    st.session_state.login=False
+    st.rerun()
+
+
+# ---------------- MAIN CONTROL ----------------
+if not st.session_state.login:
+    login_page()
+else:
+    page=sidebar()
+
+    if page=="Dashboard": dashboard()
+    elif page=="Diabetes Prediction": diabetes()
+    elif page=="Heart Prediction": heart()
+    elif page=="Health Tips": tips()
+    elif page=="Logout": logout()
 
