@@ -42,6 +42,18 @@ img.header{display:block;margin:auto;width:180px;filter:drop-shadow(0 0 15px #00
 
 .card:hover{transform:scale(1.02);transition:.4s}
 
+/* Neumorphism Cards */
+.neo{
+background:#e0e5ec22;
+border-radius:20px;
+box-shadow:8px 8px 18px #00000055,-8px -8px 18px #ffffff22;
+padding:25px;
+animation:fadeIn 1s}
+
+/* Heartbeat animation */
+@keyframes beat{0%{transform:scale(1)}25%{transform:scale(1.08)}40%{transform:scale(1)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+.beat{animation:beat 1.2s infinite;color:#ff4b5c;font-size:28px;text-align:center}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -76,12 +88,22 @@ def login_page():
     with center:
         st.markdown('<div class="card">',unsafe_allow_html=True)
         st.markdown("### 🔐 Secure Login")
+        btn1,btn2=st.columns(2)
 
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
 
         st.write("")
-        if st.button("Login"):
+        with btn1:
+            login_click = st.button("Login")
+        with btn2:
+            signup_click = st.button("Create Account")
+
+        if signup_click:
+            st.session_state.page="signup"
+            st.rerun()
+
+        if login_click:
             if username in st.session_state.users and st.session_state.users[username]==password:
                 st.session_state.login=True
                 st.success("Login successful")
@@ -119,13 +141,47 @@ def header_image():
 def dashboard():
     header_image()
 
-    col1,col2,col3 = st.columns(3)
-
-    col1.metric("Global Diabetes","537 Million")
-    col2.metric("Heart Deaths","20 Million/yr")
-    col3.metric("Model Accuracy","~88%")
+    c1,c2,c3=st.columns(3)
+    c1.markdown("<div class='neo'><h3>🩺 Stay Healthy</h3><p>Prevention is better than cure. Monitor your health regularly.</p></div>",unsafe_allow_html=True)
+    c2.markdown("<div class='neo'><h3>💊 Reminders</h3><p>Take medicines on time and maintain diet discipline.</p></div>",unsafe_allow_html=True)
+    c3.markdown("<div class='neo'><h3>🏃 Motivation</h3><p>Daily activity + good sleep = strong heart & mind.</p></div>",unsafe_allow_html=True)
 
     st.write("")
+    st.markdown("### ❤️ Health Status Indicator")
+    st.markdown("<div class='beat'>♥ Monitoring Active</div>",unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.markdown("## 🧾 Personal & Medical Profile")
+
+    col1,col2=st.columns(2)
+
+    with col1:
+        st.markdown("### 👤 Personal Details")
+        name=st.text_input("Full Name")
+        age=st.number_input("Age",1,120,25)
+        gender=st.selectbox("Gender",["Male","Female","Other"])
+        weight=st.number_input("Weight (kg)",20,200,60)
+        height=st.number_input("Height (cm)",100,220,170)
+
+    with col2:
+        st.markdown("### 🏥 Medical Details")
+        diseases=st.multiselect("Existing Conditions",
+            ["Diabetes","Heart Disease","BP","Asthma","Thyroid","None"])
+        allergies=st.text_input("Allergies")
+        meds=st.text_input("Current Medications")
+        blood=st.selectbox("Blood Group",["A+","A-","B+","B-","O+","O-","AB+","AB-"])
+
+    if st.button("Save Profile"):
+        st.success("Profile saved successfully")
+        st.markdown(f"""
+        **Saved Details**  
+        Name: {name}  
+        Age: {age}  
+        Gender: {gender}  
+        Conditions: {', '.join(diseases) if diseases else 'None'}
+        """)
+
+    st.markdown("---")
     st.info("Select a module from sidebar to begin analysis.")
 
 
