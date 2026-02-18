@@ -3,8 +3,18 @@ import pickle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+
 
 st.set_page_config(page_title="HealthGuard Pro", page_icon="🩺", layout="wide")
+st.markdown("""
+<style>
+.stApp {
+    background: linear-gradient(to right, #141E30, #243B55);
+    color: white;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # Load models
 diabetes_model = pickle.load(open("model.pkl", "rb"))
@@ -113,6 +123,9 @@ elif page == "🩸 Diabetes":
 
         input_data = np.array([[preg, glucose, bp, 20, insulin, bmi, dpf, age]])
         probability = diabetes_model.predict_proba(input_data)[0][1] * 100
+        health_score = 100 - probability
+st.metric("🧬 Health Score", f"{health_score:.1f}/100")
+
 
         st.progress(int(probability))
         st.write(f"### Risk Probability: {probability:.2f}%")
@@ -124,10 +137,22 @@ elif page == "🩸 Diabetes":
         else:
             st.error("🔴 High Risk - Consult Doctor")
 
-        fig, ax = plt.subplots()
-        ax.bar(["Safe", "Risk"], [100 - probability, probability])
-        ax.set_ylabel("Percentage")
-        st.pyplot(fig)
+        fig_gauge = go.Figure(go.Indicator(
+    mode="gauge+number",
+    value=probability,
+    title={'text': "Diabetes Risk Level"},
+    gauge={
+        'axis': {'range': [0, 100]},
+        'steps': [
+            {'range': [0, 30], 'color': "green"},
+            {'range': [30, 70], 'color': "yellow"},
+            {'range': [70, 100], 'color': "red"}
+        ],
+    }
+))
+
+st.plotly_chart(fig_gauge, use_container_width=True)
+
 
 
 # ================= HEART =================
@@ -163,5 +188,6 @@ elif page == "❤️ Heart Disease":
                labels=["Risk", "Safe"],
                autopct="%1.1f%%")
         st.pyplot(fig)
+
 
 
